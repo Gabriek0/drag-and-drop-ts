@@ -1,3 +1,19 @@
+// Decorators
+// method decorators use three parameters, target, methodName, and descriptor.
+function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjustedPropertyDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const bindFunction = originalMethod.bind(this);
+
+      return bindFunction;
+    },
+  };
+
+  return adjustedPropertyDescriptor;
+}
+
 class ProjectInput {
   // Main Elements
   element: HTMLFormElement;
@@ -38,6 +54,7 @@ class ProjectInput {
     this.attach();
   }
 
+  @AutoBind
   private submitHandler(event: SubmitEvent) {
     event.preventDefault();
 
@@ -49,9 +66,7 @@ class ProjectInput {
   }
 
   private configure() {
-    this.element.addEventListener("submit", (event) =>
-      this.submitHandler(event)
-    );
+    this.element.addEventListener("submit", this.submitHandler);
   }
 
   private attach() {
