@@ -54,14 +54,37 @@ class ProjectInput {
     this.attach();
   }
 
+  private gatherUserInput(): [string, string, number] | void {
+    const title = this.titleInputElement.value;
+    const people = this.peopleInputElement.value;
+    const description = this.descriptionInputElement.value;
+
+    const isTitleValid = title.trim().length !== 0;
+    const isPeopleValid = people.trim().length !== 0;
+    const isDescriptionValid = description.trim().length !== 0;
+
+    const valid = isTitleValid && isDescriptionValid && isPeopleValid;
+
+    if (valid) return [title, description, +people];
+
+    return alert("There are fields empty or invalid.");
+  }
+
   @AutoBind
   private submitHandler(event: SubmitEvent) {
     event.preventDefault();
 
+    const inputs = this.gatherUserInput();
+    const isArray = Array.isArray(inputs);
+
+    if (!isArray) return;
+
+    const [title, description, people] = inputs;
+
     console.table({
-      title: this.titleInputElement.value,
-      description: this.descriptionInputElement.value,
-      people: this.peopleInputElement.value,
+      title,
+      description,
+      people,
     });
   }
 
