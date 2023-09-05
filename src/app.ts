@@ -1,12 +1,14 @@
 // Interfaces
-interface Validatable {
+type Validatable = {
   value: string | number;
   required?: boolean;
   minLength?: number;
   maxLength?: number;
   max?: number;
   min?: number;
-}
+};
+
+type ElementId = "active" | "finished";
 
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
@@ -177,4 +179,41 @@ class ProjectInput {
   }
 }
 
+class ProjectList {
+  element: HTMLElement;
+  hostElement: HTMLDivElement;
+  templateElement: HTMLTemplateElement;
+
+  constructor(private elementId: ElementId) {
+    this.templateElement = <HTMLTemplateElement>(
+      document.getElementById("project-list")
+    );
+    this.hostElement = <HTMLDivElement>document.getElementById("app");
+
+    const htmlContent = document.importNode(this.templateElement.content, true);
+    this.element = <HTMLFormElement>htmlContent.firstElementChild;
+
+    // element id will be dynamic
+    this.element.id = `${this.elementId}-projects`;
+
+    this.attach();
+    this.renderInternalContentInLists();
+  }
+
+  // Methods
+  private renderInternalContentInLists() {
+    const listId = `${this.elementId}-projects-list`;
+    const listTitle = `${this.elementId.toUpperCase()} PROJECTS`;
+
+    this.element.querySelector("ul")!.id = listId;
+    this.element.querySelector("h2")!.textContent = listTitle;
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement("beforeend", this.element);
+  }
+}
+
 const projectInputInstance = new ProjectInput();
+const projectsListActive = new ProjectList("active");
+const projectsListFinished = new ProjectList("finished");
