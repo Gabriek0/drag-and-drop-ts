@@ -1,3 +1,13 @@
+// Interfaces
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  max?: number;
+  min?: number;
+}
+
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
 function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
@@ -12,6 +22,59 @@ function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
   };
 
   return adjustedPropertyDescriptor;
+}
+
+function validate(validatable: Validatable) {
+  const {
+    value: prevValue,
+    required,
+    minLength,
+    maxLength,
+    min,
+    max,
+  } = validatable;
+
+  let isValid: boolean = true;
+  let value = prevValue;
+
+  const isString = typeof value === "string";
+  const isNumber = typeof value === "number";
+
+  const hasMinLength = minLength != null;
+  const hasMaxLength = maxLength != null;
+
+  const hasMin = min != null;
+  const hasMax = max != null;
+
+  if (required) {
+    isValid = value.toString().length > 0;
+  }
+
+  if (isString) {
+    value = value.toString().trim();
+
+    if (hasMinLength) {
+      isValid = value.length > minLength;
+    }
+
+    if (hasMaxLength) {
+      isValid = value.length < maxLength;
+    }
+  }
+
+  if (isNumber) {
+    value = Number(value);
+
+    if (hasMin) {
+      isValid = value > min;
+    }
+
+    if (hasMax) {
+      isValid = value < max;
+    }
+  }
+
+  return isValid;
 }
 
 class ProjectInput {
@@ -54,22 +117,6 @@ class ProjectInput {
     this.attach();
   }
 
-  private gatherUserInput(): [string, string, number] | void {
-    const title = this.titleInputElement.value;
-    const people = this.peopleInputElement.value;
-    const description = this.descriptionInputElement.value;
-
-    const isTitleValid = title.trim().length !== 0;
-    const isPeopleValid = people.trim().length !== 0;
-    const isDescriptionValid = description.trim().length !== 0;
-
-    const valid = isTitleValid && isDescriptionValid && isPeopleValid;
-
-    if (valid) return [title, description, +people];
-
-    return alert("There are fields empty or invalid.");
-  }
-
   @AutoBind
   private submitHandler(event: SubmitEvent) {
     event.preventDefault();
@@ -86,6 +133,39 @@ class ProjectInput {
       description,
       people,
     });
+
+    this.clearInputs();
+  }
+
+  private gatherUserInput(): [string, string, number] | void {
+    const enteredTitle = this.titleInputElement.value;
+    const enteredPeople = this.peopleInputElement.value;
+    const enteredDescription = this.descriptionInputElement.value;
+
+    const title = validate({ value: enteredTitle, required: true });
+    const description = validate({
+      value: enteredDescription,
+      required: true,
+      minLength: 5,
+    });
+    const people = validate({
+      value: +enteredPeople,
+      required: true,
+      min: 1,
+      max: 10,
+    });
+
+    const isValid = title && description && people;
+
+    if (isValid) return [enteredTitle, enteredDescription, +enteredPeople];
+
+    return alert("There are fields empty or invalid.");
+  }
+
+  private clearInputs() {
+    this.titleInputElement.value = "";
+    this.peopleInputElement.value = "";
+    this.descriptionInputElement.value = "";
   }
 
   private configure() {
