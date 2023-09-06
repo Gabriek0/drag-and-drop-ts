@@ -1,4 +1,11 @@
 // Interfaces
+type Project = {
+  id: string;
+  title: string;
+  description: string;
+  peoples: number;
+};
+
 type Validatable = {
   value: string | number;
   required?: boolean;
@@ -9,6 +16,8 @@ type Validatable = {
 };
 
 type ElementId = "active" | "finished";
+type Projects = Project[];
+type Listeners = Array<(projects: Projects) => void>;
 
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
@@ -26,6 +35,7 @@ function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
   return adjustedPropertyDescriptor;
 }
 
+// Functions
 function validate(validatable: Validatable) {
   const {
     value: prevValue,
@@ -79,6 +89,56 @@ function validate(validatable: Validatable) {
   return isValid;
 }
 
+// Classes
+// Project State Management Class
+class ProjectState {
+  private listeners: Listeners = []; // listeners list
+  private projects: Projects = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getSingleInstance() {
+    if (!this.instance) {
+      this.instance = new ProjectState();
+      return this.instance;
+    }
+
+    return this.instance;
+  }
+
+  public addProject(project: Omit<Project, "id">) {
+    const id = Math.random().toString();
+    const { title, peoples, description } = project;
+
+    const newProject: Project = {
+      id,
+      title,
+      description,
+      peoples,
+    };
+
+    this.projects.push(newProject);
+
+    for (const listener of this.listeners) {
+      // slice return a copy of array
+      // this will be avoid bugs with the projects state
+      // becausa will be a unique state for each
+      listener(this.projects.slice());
+
+      // (project) => {};
+    }
+  }
+
+  public addListener(listenerFunction: (projects: Projects) => void) {
+    this.listeners.push(listenerFunction);
+  }
+}
+
+// global constant instantiating ProjectState class
+const projectState = ProjectState.getSingleInstance();
+
+// Project Input Class
 class ProjectInput {
   // Main Elements
   element: HTMLFormElement;
@@ -130,10 +190,10 @@ class ProjectInput {
 
     const [title, description, people] = inputs;
 
-    console.table({
-      title,
-      description,
-      people,
+    projectState.addProject({
+      title: title,
+      description: description,
+      peoples: people,
     });
 
     this.clearInputs();
@@ -179,16 +239,20 @@ class ProjectInput {
   }
 }
 
+// Project List Class
 class ProjectList {
   element: HTMLElement;
   hostElement: HTMLDivElement;
   templateElement: HTMLTemplateElement;
+
+  assignedProject: Projects;
 
   constructor(private elementId: ElementId) {
     this.templateElement = <HTMLTemplateElement>(
       document.getElementById("project-list")
     );
     this.hostElement = <HTMLDivElement>document.getElementById("app");
+    this.assignedProject = [];
 
     const htmlContent = document.importNode(this.templateElement.content, true);
     this.element = <HTMLFormElement>htmlContent.firstElementChild;
@@ -196,13 +260,33 @@ class ProjectList {
     // element id will be dynamic
     this.element.id = `${this.elementId}-projects`;
 
+    projectState.addListener((projects: Projects) => {
+      console.log(projects);
+
+      this.assignedProject = projects;
+
+      this.renderProjects();
+    });
+
     this.attach();
     this.renderInternalContentInLists();
   }
 
   // Methods
+  private renderProjects() {
+    const listElement = <HTMLUListElement>(
+      document.getElementById(`${this.elementId}-project-list`)
+    );
+
+    for (const projectItem of this.assignedProject) {
+      const listItem = document.createElement("li");
+      listItem.textContent = projectItem.title;
+      listElement.appendChild(listItem);
+    }
+  }
+
   private renderInternalContentInLists() {
-    const listId = `${this.elementId}-projects-list`;
+    const listId = `${this.elementId}-project-list`;
     const listTitle = `${this.elementId.toUpperCase()} PROJECTS`;
 
     this.element.querySelector("ul")!.id = listId;
@@ -215,5 +299,5 @@ class ProjectList {
 }
 
 const projectInputInstance = new ProjectInput();
-const projectsListActive = new ProjectList("active");
-const projectsListFinished = new ProjectList("finished");
+const projectsListActiveInstance = new ProjectList("active");
+const projectsListFinishedInstance = new ProjectList("finished");
