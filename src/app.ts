@@ -133,8 +133,6 @@ class ProjectState {
       // this will be avoid bugs with the projects state
       // because will be a unique state for each
       listener(this.projects.slice());
-
-      // (project) => {};
     }
   }
 
@@ -270,10 +268,15 @@ class ProjectList {
     this.element.id = `${this.elementId}-projects`;
 
     projectState.addListener((projects: Projects) => {
-      console.log(projects);
+      const relevantProjects = projects.filter((project) => {
+        if (this.elementId === "active") {
+          return project.status === ProjectStatus.Active;
+        }
 
-      this.assignedProject = projects;
+        return project.status === ProjectStatus.Finished;
+      });
 
+      this.assignedProject = relevantProjects;
       this.renderProjects();
     });
 
@@ -286,6 +289,8 @@ class ProjectList {
     const listElement = <HTMLUListElement>(
       document.getElementById(`${this.elementId}-project-list`)
     );
+
+    listElement.innerHTML = "";
 
     for (const projectItem of this.assignedProject) {
       const listItem = document.createElement("li");
