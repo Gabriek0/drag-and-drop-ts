@@ -1,9 +1,15 @@
-// Interfaces
+// Types
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
 type Project = {
   id: string;
   title: string;
   description: string;
-  peoples: number;
+  people: number;
+  status: ProjectStatus;
 };
 
 type Validatable = {
@@ -17,7 +23,8 @@ type Validatable = {
 
 type ElementId = "active" | "finished";
 type Projects = Project[];
-type Listeners = Array<(projects: Projects) => void>;
+type Listener = (projects: Projects) => void;
+type Listeners = Listener[];
 
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
@@ -109,13 +116,14 @@ class ProjectState {
 
   public addProject(project: Omit<Project, "id">) {
     const id = Math.random().toString();
-    const { title, peoples, description } = project;
+    const { title, people, description, status } = project;
 
     const newProject: Project = {
       id,
       title,
       description,
-      peoples,
+      people,
+      status,
     };
 
     this.projects.push(newProject);
@@ -123,14 +131,14 @@ class ProjectState {
     for (const listener of this.listeners) {
       // slice return a copy of array
       // this will be avoid bugs with the projects state
-      // becausa will be a unique state for each
+      // because will be a unique state for each
       listener(this.projects.slice());
 
       // (project) => {};
     }
   }
 
-  public addListener(listenerFunction: (projects: Projects) => void) {
+  public addListener(listenerFunction: Listener) {
     this.listeners.push(listenerFunction);
   }
 }
@@ -193,7 +201,8 @@ class ProjectInput {
     projectState.addProject({
       title: title,
       description: description,
-      peoples: people,
+      people: people,
+      status: ProjectStatus.Active,
     });
 
     this.clearInputs();
