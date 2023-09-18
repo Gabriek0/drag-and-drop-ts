@@ -290,7 +290,9 @@ class ProjectList {
       document.getElementById(`${this.elementId}-project-list`)
     );
 
-    listElement.innerHTML = "";
+    while (listElement.firstChild) {
+      listElement.removeChild(listElement.firstChild);
+    }
 
     for (const projectItem of this.assignedProject) {
       const listItem = document.createElement("li");
