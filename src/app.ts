@@ -38,6 +38,11 @@ type StateDTO<T> = {
   listeners: Listener<T>;
 };
 
+type ProjectItemDTO = {
+  project: Project;
+  hostElementId: string;
+};
+
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
 function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
@@ -110,6 +115,12 @@ function validate(validatable: Validatable) {
 
 // Classes
 // Component Base Class
+/**
+ *
+ * A generic component class that can be extended for creating custom components.
+ * @template T - The type of the element that this component represents.
+ * @template U - The type of the hostElement where this component will be attached.
+ */
 abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   element: T;
   hostElement: U;
@@ -119,6 +130,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     this.templateElement = <HTMLTemplateElement>(
       document.getElementById(props.templateElementId)
     );
+
     this.hostElement = <U>document.getElementById(props.hostElementId);
 
     const htmlContent = document.importNode(this.templateElement.content, true);
@@ -284,9 +296,36 @@ class ProjectInput extends Component<HTMLFormElement, HTMLDivElement> {
   }
 }
 
+// Project Item Class
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+
+  constructor(props: ProjectItemDTO) {
+    super({
+      insertPosition: "beforeend",
+      hostElementId: props.hostElementId,
+      templateElementId: "single-project",
+    });
+
+    this.project = props.project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure(): void {}
+
+  renderContent(): void {
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent = String(this.project.people);
+    this.element.querySelector("p")!.textContent = this.project.description;
+  }
+}
+
 // Project List Class
 class ProjectList extends Component<HTMLElement, HTMLDivElement> {
   assignedProject: Projects;
+  projectInstances: ProjectItem[] = [];
 
   constructor(private elementId: ElementId) {
     super({
@@ -318,19 +357,29 @@ class ProjectList extends Component<HTMLElement, HTMLDivElement> {
     });
   }
 
-  renderContent() {
-    const listElement = <HTMLUListElement>(
-      document.getElementById(`${this.elementId}-project-list`)
-    );
+  renderContent(): void {
+    <HTMLUListElement>document.getElementById(`${this.elementId}-project-list`);
 
-    while (listElement.firstChild) {
-      listElement.removeChild(listElement.firstChild);
+    for (const instance of this.projectInstances) {
+      instance.element.remove();
     }
 
-    for (const projectItem of this.assignedProject) {
-      const listItem = document.createElement("li");
-      listItem.textContent = projectItem.title;
-      listElement.appendChild(listItem);
+    this.projectInstances = [];
+
+    const listId = this.element.querySelector("ul");
+    if (!listId) return;
+
+    for (const project of this.assignedProject) {
+      const projectInstance = new ProjectItem({
+        hostElementId: listId.id,
+        project,
+      });
+
+      this.projectInstances.push(projectInstance);
+
+      // const listItem = document.createElement("li");
+      // listItem.textContent = projectItem.title;
+      // listElement.appendChild(listItem);
     }
   }
 
