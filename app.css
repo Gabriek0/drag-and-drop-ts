@@ -94,6 +94,10 @@ button:active {
   background: #fff;
 }
 
+.projects li > * {
+  pointer-events: none;
+}
+
 .projects li h2 {
   color: #ff0062;
   margin: 0.5rem 0;

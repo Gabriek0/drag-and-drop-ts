@@ -64,6 +64,11 @@ type ProjectItemDTO = {
   hostElementId: string;
 };
 
+type MoveProjectDTO = {
+  projectId: string;
+  status: ProjectStatus;
+};
+
 // Decorators
 // method decorators use three parameters, target, methodName, and descriptor.
 function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
@@ -201,7 +206,7 @@ class ProjectState extends State<Project> {
     return this.instance;
   }
 
-  public addProject(project: Omit<Project, "id">) {
+  public addProject(project: Omit<Project, "id">): void {
     const id = Math.random().toString();
     const { title, people, description, status } = project;
 
@@ -214,7 +219,21 @@ class ProjectState extends State<Project> {
     };
 
     this.projects.push(newProject);
+    this.updateListeners();
+  }
 
+  public moveProject(props: MoveProjectDTO): void {
+    const project =
+      this.projects.find((project) => project.id === props.projectId) ?? null;
+
+    if (!project) return;
+    if (project.status === props.status) return;
+
+    project.status = props.status;
+    this.updateListeners();
+  }
+
+  private updateListeners(): void {
     for (const listener of this.listeners) {
       // slice return a copy of array
       // this will be avoid bugs with the projects state
@@ -345,11 +364,17 @@ class ProjectItem
     this.renderContent();
   }
 
-  dragStartHandler(event: DragEvent) {
-    console.log("DragStart", event);
+  dragStartHandler(event: DragEvent): void {
+    if (!event.dataTransfer) return;
+
+    event.dataTransfer.setData("text/plain", this.project.id);
+    event.dataTransfer.effectAllowed = "move";
   }
+
   dragEndHandler(event: DragEvent) {
-    console.log("DragEnd", event);
+    if (!event.dataTransfer) return;
+
+    // event.dataTransfer.clearData("text/plain");
   }
 
   configure(): void {
@@ -392,15 +417,34 @@ class ProjectList
   }
 
   // Methods
-  dropHandler(_: DragEvent) {}
+  dragOverHandler(event: DragEvent) {
+    if (!event.dataTransfer) return;
+    if (event.dataTransfer.types[0] !== "text/plain") return;
+
+    event.preventDefault();
+
+    const listElement = this.element.querySelector("ul");
+    listElement?.classList.add("droppable");
+  }
+
   dragLeaveHandler(_: DragEvent) {
     const listElement = this.element.querySelector("ul");
     listElement?.classList.remove("droppable");
   }
 
-  dragOverHandler(_: DragEvent) {
-    const listElement = this.element.querySelector("ul");
-    listElement?.classList.add("droppable");
+  dropHandler(event: DragEvent) {
+    if (!event.dataTransfer) return;
+
+    const projectId = event.dataTransfer.getData("text/plain");
+    const status =
+      this.elementId === "active"
+        ? ProjectStatus.Active
+        : ProjectStatus.Finished;
+
+    projectState.moveProject({
+      projectId,
+      status,
+    });
   }
 
   configure(): void {
