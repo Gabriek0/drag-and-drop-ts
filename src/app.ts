@@ -300,6 +300,14 @@ class ProjectInput extends Component<HTMLFormElement, HTMLDivElement> {
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
   private project: Project;
 
+  get persons(): string {
+    if (this.project.people === 1) {
+      return `${this.project.people} Person assigned`;
+    }
+
+    return `${this.project.people} Persons assigned`;
+  }
+
   constructor(props: ProjectItemDTO) {
     super({
       insertPosition: "beforeend",
@@ -317,7 +325,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
 
   renderContent(): void {
     this.element.querySelector("h2")!.textContent = this.project.title;
-    this.element.querySelector("h3")!.textContent = String(this.project.people);
+    this.element.querySelector("h3")!.textContent = this.persons;
     this.element.querySelector("p")!.textContent = this.project.description;
   }
 }
