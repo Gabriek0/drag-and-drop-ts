@@ -1,3 +1,24 @@
+// Interface Drag & Drop
+
+// This interface will be to ProjectItem class
+interface Draggable {
+  dragStartHandler: (event: DragEvent) => void;
+  dragEndHandler: (event: DragEvent) => void;
+}
+
+// This interface will be to ProjectList Class
+/**
+ *
+ * @param dropHandler The element was dropped
+ * @param dropOverHandler The element is being dragged
+ * @param dropLeaveHandler The visual feedback to user, if element is draggable into the blocked area
+ */
+interface DragTarget {
+  dropHandler: (event: DragEvent) => void;
+  dragOverHandler: (event: DragEvent) => void;
+  dragLeaveHandler: (event: DragEvent) => void;
+}
+
 // Types
 enum ProjectStatus {
   Active,
@@ -297,7 +318,10 @@ class ProjectInput extends Component<HTMLFormElement, HTMLDivElement> {
 }
 
 // Project Item Class
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem
+  extends Component<HTMLUListElement, HTMLLIElement>
+  implements Draggable
+{
   private project: Project;
 
   get persons(): string {
@@ -321,7 +345,21 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     this.renderContent();
   }
 
-  configure(): void {}
+  dragStartHandler(event: DragEvent) {
+    console.log("DragStart", event);
+  }
+  dragEndHandler(event: DragEvent) {
+    console.log("DragEnd", event);
+  }
+
+  configure(): void {
+    this.element.addEventListener("dragstart", (event) =>
+      this.dragStartHandler(event)
+    );
+    this.element.addEventListener("dragend", (event) =>
+      this.dragEndHandler(event)
+    );
+  }
 
   renderContent(): void {
     this.element.querySelector("h2")!.textContent = this.project.title;
