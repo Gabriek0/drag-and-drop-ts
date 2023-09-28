@@ -1,10 +1,9 @@
-// Interface Drag & Drop
 namespace App {
   // This interface will be to ProjectItem class
-  export interface Draggable {
+  export type Draggable = {
     dragStartHandler: (event: DragEvent) => void;
     dragEndHandler: (event: DragEvent) => void;
-  }
+  };
 
   // This interface will be to ProjectList Class
   /**
@@ -13,9 +12,9 @@ namespace App {
    * @param dropOverHandler The element is being dragged
    * @param dropLeaveHandler The visual feedback to user, if element is draggable into the blocked area
    */
-  export interface DragTarget {
+  export type DragTarget = {
     dropHandler: (event: DragEvent) => void;
     dragOverHandler: (event: DragEvent) => void;
     dragLeaveHandler: (event: DragEvent) => void;
-  }
+  };
 }

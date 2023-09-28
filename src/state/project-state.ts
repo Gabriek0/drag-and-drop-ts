@@ -1,5 +1,6 @@
 namespace App {
   export type Projects = Project[];
+
   type Listener<T> = (projects: T[]) => void;
 
   type MoveProjectDTO = {
