@@ -1,6 +1,6 @@
-import { Draggable } from "../models/Drag&Drop";
-import { Project } from "../models/Project";
-import { Component } from "./base";
+import { Draggable } from "../models/Drag&Drop.js";
+import { Project } from "../models/Project.js";
+import { Component } from "./base.js";
 
 type ProjectItemDTO = {
   project: Project;

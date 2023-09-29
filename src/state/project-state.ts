@@ -1,4 +1,4 @@
-import { Project, ProjectStatus } from "../models/Project";
+import { Project, ProjectStatus } from "../models/Project.js";
 
 export type Projects = Project[];
 

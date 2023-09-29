@@ -1,8 +1,8 @@
-import { DragTarget } from "../models/Drag&Drop";
-import { ProjectStatus } from "../models/Project";
-import { Projects, projectState } from "../state/project-state";
-import { Component } from "./base";
-import { ProjectItem } from "./project-item";
+import { DragTarget } from "../models/Drag&Drop.js";
+import { ProjectStatus } from "../models/Project.js";
+import { Projects, projectState } from "../state/project-state.js";
+import { Component } from "./base.js";
+import { ProjectItem } from "./project-item.js";
 
 type ElementId = "active" | "finished";
 
