@@ -1,63 +1,65 @@
-namespace App {
-  type ProjectItemDTO = {
-    project: Project;
-    hostElementId: string;
-  };
+import { Draggable } from "../models/Drag&Drop";
+import { Project } from "../models/Project";
+import { Component } from "./base";
 
-  // Project Item Class
-  export class ProjectItem
-    extends Component<HTMLUListElement, HTMLLIElement>
-    implements Draggable
-  {
-    private project: Project;
+type ProjectItemDTO = {
+  project: Project;
+  hostElementId: string;
+};
 
-    get persons(): string {
-      if (this.project.people === 1) {
-        return `${this.project.people} Person assigned`;
-      }
+// Project Item Class
+export class ProjectItem
+  extends Component<HTMLUListElement, HTMLLIElement>
+  implements Draggable
+{
+  private project: Project;
 
-      return `${this.project.people} Persons assigned`;
+  get persons(): string {
+    if (this.project.people === 1) {
+      return `${this.project.people} Person assigned`;
     }
 
-    constructor(props: ProjectItemDTO) {
-      super({
-        insertPosition: "beforeend",
-        hostElementId: props.hostElementId,
-        templateElementId: "single-project",
-      });
+    return `${this.project.people} Persons assigned`;
+  }
 
-      this.project = props.project;
+  constructor(props: ProjectItemDTO) {
+    super({
+      insertPosition: "beforeend",
+      hostElementId: props.hostElementId,
+      templateElementId: "single-project",
+    });
 
-      this.configure();
-      this.renderContent();
-    }
+    this.project = props.project;
 
-    dragStartHandler(event: DragEvent): void {
-      if (!event.dataTransfer) return;
+    this.configure();
+    this.renderContent();
+  }
 
-      event.dataTransfer.setData("text/plain", this.project.id);
-      event.dataTransfer.effectAllowed = "move";
-    }
+  dragStartHandler(event: DragEvent): void {
+    if (!event.dataTransfer) return;
 
-    dragEndHandler(event: DragEvent) {
-      if (!event.dataTransfer) return;
+    event.dataTransfer.setData("text/plain", this.project.id);
+    event.dataTransfer.effectAllowed = "move";
+  }
 
-      // event.dataTransfer.clearData("text/plain");
-    }
+  dragEndHandler(event: DragEvent) {
+    if (!event.dataTransfer) return;
 
-    configure(): void {
-      this.element.addEventListener("dragstart", (event) =>
-        this.dragStartHandler(event)
-      );
-      this.element.addEventListener("dragend", (event) =>
-        this.dragEndHandler(event)
-      );
-    }
+    // event.dataTransfer.clearData("text/plain");
+  }
 
-    renderContent(): void {
-      this.element.querySelector("h2")!.textContent = this.project.title;
-      this.element.querySelector("h3")!.textContent = this.persons;
-      this.element.querySelector("p")!.textContent = this.project.description;
-    }
+  configure(): void {
+    this.element.addEventListener("dragstart", (event) =>
+      this.dragStartHandler(event)
+    );
+    this.element.addEventListener("dragend", (event) =>
+      this.dragEndHandler(event)
+    );
+  }
+
+  renderContent(): void {
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent = this.persons;
+    this.element.querySelector("p")!.textContent = this.project.description;
   }
 }

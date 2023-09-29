@@ -1,17 +1,15 @@
-namespace App {
-  // Decorators
-  // method decorators use three parameters, target, methodName, and descriptor.
-  export function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const adjustedPropertyDescriptor: PropertyDescriptor = {
-      configurable: true,
-      get() {
-        const bindFunction = originalMethod.bind(this);
+// Decorators
+// method decorators use three parameters, target, methodName, and descriptor.
+export function AutoBind(_: any, __: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjustedPropertyDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const bindFunction = originalMethod.bind(this);
 
-        return bindFunction;
-      },
-    };
+      return bindFunction;
+    },
+  };
 
-    return adjustedPropertyDescriptor;
-  }
+  return adjustedPropertyDescriptor;
 }
