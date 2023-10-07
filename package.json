@@ -13,7 +13,7 @@
     "typescript",
     "course"
   ],
-  "author": "Maximilian Schwarzmüller",
+  "author": "Gabriel Henrique",
   "license": "ISC",
   "devDependencies": {
     "lite-server": "^2.5.4",
