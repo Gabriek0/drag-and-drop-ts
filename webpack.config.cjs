@@ -1,16 +1,18 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/app.ts",
   mode: "development",
+  entry: "./src/app.ts",
+  devServer: {
+    port: 3000,
+    static: { directory: path.join(__dirname) },
+  },
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
+    publicPath: "/dist/",
   },
   devtool: "inline-source-map",
-  resolve: {
-    extensions: [".tsx", ".ts", ".js"],
-  },
   module: {
     rules: [
       {
@@ -19,5 +21,8 @@ module.exports = {
         exclude: /node_modules/,
       },
     ],
+  },
+  resolve: {
+    extensions: [".ts", ".js"],
   },
 };
