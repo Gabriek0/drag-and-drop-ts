@@ -19,7 +19,7 @@ This simple project aims to consolidate knowledge of Typescript. Its main object
 
 ### 📄 Documentation
 
-👉 Access the Documentation: [Docs](https://www.notion.so/Drag-Drop-4eee0844355b47109c6f59896f10db30?pvs=4)
+👉 Access the Documentation: [Docs](https://clever-path-712.notion.site/Drag-Drop-Typescript-22896a7ff50d4ae3a11ea69d8f4e72e9)
 
 > :warning: **Important**: The documentation is in PT/BR.
 
