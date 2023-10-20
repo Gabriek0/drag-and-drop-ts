@@ -22,7 +22,7 @@ abstract class State<T> {
 
 // Project State Management Class
 export class ProjectState extends State<Project> {
-  //private listeners: Listeners = []; // listeners list
+  // private listeners: Listeners = []; // listeners list
   private projects: Projects = [];
   private static instance: ProjectState;
 

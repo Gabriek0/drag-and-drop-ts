@@ -17,9 +17,11 @@
 
 This simple project aims to consolidate knowledge of Typescript. Its main objective is to use Typescript and its types to manipulate DOM elements and build a native Drag and Drop.
 
-<!-- ### 📄 Documentation
+### 📄 Documentation
 
-👉 Access the Documentation: [Docs](<[Docs]()>) -->
+👉 Access the Documentation: [Docs](<[Docs](https://www.notion.so/Drag-Drop-4eee0844355b47109c6f59896f10db30?pvs=4)>)
+
+> :warning: **Important**: The documentation is in PT/BR.
 
 <!-- ### ✏️ Concepts used
 
